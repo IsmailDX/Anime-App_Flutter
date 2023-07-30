@@ -1,40 +1,13 @@
 import 'package:anime_app/models/character.dart';
+import 'package:anime_app/widgets/image_downloader.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class CharacterImagesScreen extends StatelessWidget {
   const CharacterImagesScreen({required this.character, Key? key})
       : super(key: key);
 
   final Character character;
-
-  Future<void> _saveImageToGallery(
-      BuildContext context, String imagePath) async {
-    if (!(await Permission.storage.isGranted)) {
-      var status = await Permission.storage.request();
-      if (!status.isGranted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Permission denied to access storage')),
-        );
-        return;
-      }
-    }
-
-    try {
-      ByteData data = await rootBundle.load(imagePath);
-      await ImageGallerySaver.saveImage(data.buffer.asUint8List());
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Image saved to gallery')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to save image')),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +42,8 @@ class CharacterImagesScreen extends StatelessWidget {
                             ),
                             TextButton(
                               onPressed: () {
-                                _saveImageToGallery(context, imagePath);
+                                ImageDownloader.saveImageToGallery(
+                                    context, imagePath);
                                 Navigator.of(context).pop();
                               },
                               child: const Text('Download'),
